@@ -1,5 +1,6 @@
 package com.example.android.udacityinventoryapp;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -31,6 +32,12 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == R.id.action_addProduct) {
+            Intent intent= new Intent(MainActivity.this, AddActivity.class);
+            startActivity(intent);
+
             return true;
         }
 

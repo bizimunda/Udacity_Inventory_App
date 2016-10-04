@@ -20,10 +20,10 @@
             android:name=".AddActivity"
             android:label="@string/title_activity_add" >
         </activity>
-        <activity
-            android:name=".DetailActivity"
-            android:label="@string/title_activity_detail" >
-        </activity>
+        <provider
+            android:name=".data.ProductProvider"
+            android:authorities="com.example.android.products"
+            android:exported="false" />
     </application>
 
 </manifest>
