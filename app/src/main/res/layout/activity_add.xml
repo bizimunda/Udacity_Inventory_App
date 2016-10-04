@@ -9,22 +9,46 @@
     android:orientation="vertical"
     tools:context="com.example.android.udacityinventoryapp.AddActivity">
 
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/add_a_new_product"
         android:id="@+id/et_addActivity_name"/>
 
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/quantity"
+        android:inputType="number"
         android:id="@+id/et_addActivity_quantity"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/btn_increase"
+            android:text="Increase"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_decrease"
+            android:text="Decrease"/>
+        </LinearLayout>
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/price"
+        android:inputType="number"
         android:id="@+id/et_addActivity_price"/>
 
     <ImageView
@@ -35,8 +59,11 @@
 
     <Button
         android:layout_width="match_parent"
+        android:id="@+id/btn_addActivity_addButton"
         android:layout_height="wrap_content"
         android:text="@string/add_product"/>
+
+
 
 
 

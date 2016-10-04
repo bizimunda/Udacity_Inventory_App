@@ -23,8 +23,10 @@ public class ProductDbHelper extends SQLiteOpenHelper {
                 + ProductContract.ProductEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + ProductContract.ProductEntry.COLUMN_PRODUCT_NAME + " TEXT NOT NULL, "
                 + ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY + " TEXT, "
-                + ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE + " INTEGER DEFAULT 0, "
-                + ProductContract.ProductEntry.COLUMN_PRODUCT_IMAGE + " BLOB);";
+                + ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE + " INTEGER DEFAULT 0);";
+
+
+               // + ProductContract.ProductEntry.COLUMN_PRODUCT_IMAGE + " BLOB);";
         // Execute the SQL statement
         db.execSQL(SQL_CREATE_PETS_TABLE);
 
