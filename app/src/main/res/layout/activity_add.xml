@@ -54,14 +54,23 @@
     <ImageView
         android:layout_width="200dp"
         android:layout_height="200dp"
+        android:src="@drawable/ic_launcher"
         android:layout_gravity="center_horizontal"
         android:id="@+id/iv_addActivity_picture"/>
 
     <Button
         android:layout_width="match_parent"
-        android:id="@+id/btn_addActivity_addButton"
         android:layout_height="wrap_content"
-        android:text="@string/add_product"/>
+        android:text="@string/image_upload"
+        android:id="@+id/btn_addActivity_imageUpload"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/email"
+        android:id="@+id/btn_addActivity_email"/>
+
+
 
 
 

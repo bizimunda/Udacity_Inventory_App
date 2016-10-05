@@ -5,40 +5,45 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.android.udacityinventoryapp.data.ProductContract;
 
+import java.io.ByteArrayOutputStream;
 
-public class AddActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Cursor>, View.OnTouchListener{
+
+public class AddActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Cursor>, View.OnTouchListener {
 
     private static final int EXISTING_PET_LOADER = 1;
+    private static final int PRODUCT_LOADER = 1;
+    private static final int FILE_SELECT_CODE = 2;
     private EditText mNameEditText;
     private EditText mQuantityEditText;
     private EditText mPriceEditText;
 
     private Uri mCurrentProductUri;
-    private Button btnIncrease;
-    private Button btnDecrease;
+    private Button btnImageUpload;
+    private Button btnEmail;
+    private ImageView imageView;
 
-    private int quantity_;
-    private int returnedValue;
-    private String quantity;
-    private int increasedValue;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,52 +62,52 @@ public class AddActivity extends ActionBarActivity implements LoaderManager.Load
 
         }
 
-        btnDecrease= (Button) findViewById(R.id.btn_decrease);
-        btnIncrease= (Button) findViewById(R.id.btn_increase);
 
-        btnIncrease.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Cursor cursor = getContentResolver().query(mCurrentProductUri, null, null,null,null);
-                if(cursor.moveToFirst()){
-                    int quantityColumnIndex=cursor.getColumnIndex(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY);
-
-                    quantity = cursor.getString(quantityColumnIndex);
-                    quantity_=Integer.parseInt(quantity);
-
-                    increasedValue= increaseQuantity(quantity_);
-
-                    Log.i("onClick", String.valueOf(increasedValue));
-
-                } else {
-
-                    return;
-                }
-            }
-        });
-
-        btnDecrease.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-
-        mNameEditText= (EditText) findViewById(R.id.et_addActivity_name);
-        mQuantityEditText= (EditText) findViewById(R.id.et_addActivity_quantity);
-        mPriceEditText= (EditText) findViewById(R.id.et_addActivity_price);
+        mNameEditText = (EditText) findViewById(R.id.et_addActivity_name);
+        mQuantityEditText = (EditText) findViewById(R.id.et_addActivity_quantity);
+        mPriceEditText = (EditText) findViewById(R.id.et_addActivity_price);
+        btnImageUpload=(Button)findViewById(R.id.btn_addActivity_imageUpload);
+        btnEmail=(Button)findViewById(R.id.btn_addActivity_email);
+        imageView=(ImageView)findViewById(R.id.iv_addActivity_picture);
 
         mNameEditText.setOnTouchListener(this);
         mQuantityEditText.setOnTouchListener(this);
         mPriceEditText.setOnTouchListener(this);
+
+        btnImageUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buttonImageClick();
+            }
+        });
+
+
     }
 
-    private int increaseQuantity(int quantity_) {
+    private void buttonImageClick() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), FILE_SELECT_CODE);
+    }
 
-         returnedValue=quantity_+1;
-        return returnedValue;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == FILE_SELECT_CODE) {
+            if (resultCode == RESULT_OK) {
+                try {
+                    Uri imageUri = data.getData();
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+
+                    imageView.setImageBitmap(bitmap);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 
@@ -135,6 +140,18 @@ public class AddActivity extends ActionBarActivity implements LoaderManager.Load
             return true;
         }
 
+        if (id == R.id.action_sell) {
+            sellItem();
+            finish();
+            return true;
+        }
+
+        if (id == R.id.action_receive) {
+            receiveItem();
+            finish();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -145,7 +162,7 @@ public class AddActivity extends ActionBarActivity implements LoaderManager.Load
                 ProductContract.ProductEntry.COLUMN_PRODUCT_NAME,
                 ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY,
                 ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE
-                };
+        };
 
         return new CursorLoader(this,
                 mCurrentProductUri,
@@ -232,55 +249,95 @@ public class AddActivity extends ActionBarActivity implements LoaderManager.Load
 
     private void saveProduct() {
         String nameString = mNameEditText.getText().toString().trim();
-        String quantityString = mQuantityEditText.getText().toString().trim();
+        String countString = mQuantityEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().trim();
 
-        if (mCurrentProductUri == null &&
-                TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(quantityString) &&
-                TextUtils.isEmpty(priceString)) {
-            // Since no fields were modified, we can return early without creating a new pet.
-            // No need to create ContentValues and no need to do any ContentProvider operations.
+        if (TextUtils.isEmpty(nameString) || TextUtils.isEmpty(countString)
+                || TextUtils.isEmpty(priceString)) {
+            Toast.makeText(this,"Please fill out all values", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        ContentValues values = new ContentValues();
-        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, nameString);
-        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, quantityString);
-        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE, priceString);
+        int count = Integer.valueOf(countString);
+        double price = Double.valueOf(priceString);
 
-
-        if (mCurrentProductUri == null) {
-
-            Uri newUri = getContentResolver().insert(ProductContract.ProductEntry.CONTENT_URI, values);
-
-            if (newUri == null) {
-                // If the new content URI is null, then there was an error with insertion.
-                Toast.makeText(this, getString(R.string.editor_insert_product_failed),
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                // Otherwise, the insertion was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_insert_product_successful),
-                        Toast.LENGTH_SHORT).show();
-            }
-        } else {
-
-            int rowsAffected = getContentResolver().update(mCurrentProductUri, values, null, null);
-
-            if (rowsAffected == 0) {
-                // If no rows were affected, then there was an error with the update.
-                Toast.makeText(this, "update failed",
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, "updated successful",
-                        Toast.LENGTH_SHORT).show();
-            }
+        if(count < 0) {
+            Toast.makeText(this,"You must input a real number for the count field.", Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        if(price < 0.0) {
+            Toast.makeText(this,"You must input a real price.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(imageView.getDrawable() == null) {
+            Toast.makeText(this,"You must upload an image.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Bitmap imageBitMap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        imageBitMap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+        byte[] imageByteArray = bos.toByteArray();
+
+
+        // Create a ContentValues object where column names are the keys,
+        // and pet attributes from the editor are the values.
+        ContentValues values = new ContentValues();
+        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, nameString);
+        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, count);
+        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE, price);
+        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_IMAGE, imageByteArray);
+
+        Uri newUri = getContentResolver().insert(ProductContract.ProductEntry.CONTENT_URI, values);
+
+        // Show a toast message depending on whether or not the insertion was successful
+        if (newUri == null) {
+            // If the row ID is -1, then there was an error with insertion.
+            Toast.makeText(this, "failed", Toast.LENGTH_SHORT).show();
+        } else {
+            // Otherwise, the insertion was successful and we can display a toast with the row ID.
+            Toast.makeText(this, "successfully added", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
     }
 
-    private void decrease(View v){
+    private void sellItem() {
+
+        ContentValues values = new ContentValues();
+
+        int sell = Integer.valueOf(mQuantityEditText.getText().toString());
+
+
+        if (sell == 0) {
+            return;
+        } else {
+            sell = sell - 1;
+        }
+
+        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, sell);
+
+        getContentResolver().update(mCurrentProductUri, values, null, null);
+
+        Toast.makeText(this, "successfully sold", Toast.LENGTH_SHORT).show();
+    }
+
+    private void receiveItem() {
+
+        ContentValues values = new ContentValues();
+
+        int receive = Integer.valueOf(mQuantityEditText.getText().toString());
+
+        receive = receive + 1;
+
+        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, receive);
+
+        getContentResolver().update(mCurrentProductUri, values, null, null);
+
+        Toast.makeText(this, "Item successfully received", Toast.LENGTH_SHORT).show();
+
 
     }
 }

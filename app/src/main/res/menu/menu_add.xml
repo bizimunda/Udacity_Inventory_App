@@ -12,4 +12,14 @@
         android:id="@+id/action_delete"
         android:title="@string/action_delete"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_sell"
+        android:title="@string/action_sell"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_receive"
+        android:title="@string/action_receive"
+        app:showAsAction="always" />
 </menu>

@@ -34,6 +34,9 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -48,11 +51,13 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
         adapter= new ProductCursorAdapter(this,null);
         productListView.setAdapter(adapter);
 
+
+
+
         productListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent= new Intent(MainActivity.this, AddActivity.class);
-
                 Uri currentUri= ContentUris.withAppendedId(ProductContract.ProductEntry.CONTENT_URI, id);
                 intent.setData(currentUri);
                 startActivity(intent);

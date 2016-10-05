@@ -31,5 +31,10 @@
     <string name="action_edit">Edit</string>
     <string name="editor_insert_product_failed">Unsuccessful</string>
     <string name="editor_insert_product_successful">Product was added successfully</string>
+    <string name="btn_sale">Sale</string>
+    <string name="action_sell">sell</string>
+    <string name="action_receive">receive</string>
+    <string name="image_upload">Image upload</string>
+    <string name="email">Email</string>
 
 </resources>

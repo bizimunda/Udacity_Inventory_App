@@ -76,22 +76,35 @@ public class ProductProvider extends ContentProvider {
     }
 
 
-    private Uri insertProduct(Uri uri, ContentValues values) {
+    private Uri insertProduct(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
         // Check that the name is not null
-        String name = values.getAsString(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME);
+        String name = contentValues.getAsString(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME);
         if (name == null) {
-            throw new IllegalArgumentException("Pet requires a name");
+            throw new IllegalArgumentException("Product requires a name");
         }
 
-        Integer gender = values.getAsInteger(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY);
-        Integer weight = values.getAsInteger(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE);
-        //Blob image=values.getAsByteArray(ProductContract.ProductEntry.COLUMN_PRODUCT_IMAGE);
+        // Check that the count is non-negative
+        Integer count = contentValues.getAsInteger(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY);
+        if (count == null || count < 0) {
+            throw new IllegalArgumentException("Product requires a count greater than or equal to 0");
+        }
 
-        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+        // Check that the price is non-negative
+        Double price = contentValues.getAsDouble(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE);
+        if (price == null || price < 0.00) {
+            throw new IllegalArgumentException("Product requires price not negative");
+        }
 
-        // Insert the new pet with the given values
-        long id = database.insert(ProductContract.ProductEntry.TABLE_NAME, null, values);
-        // If the ID is -1, then the insertion failed. Log an error and return null.
+        // Check that the image is not null
+        byte[] image = contentValues.getAsByteArray(ProductContract.ProductEntry.COLUMN_PRODUCT_IMAGE);
+        if (image == null) {
+            throw new IllegalArgumentException("Product requires image to be set");
+        }
+
+        long id = db.insert(ProductContract.ProductEntry.TABLE_NAME, null, contentValues);
+
         if (id == -1) {
             Log.e(LOG_TAG, "Failed to insert row for " + uri);
             return null;
@@ -99,7 +112,6 @@ public class ProductProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri, null);
 
-        // Return the new URI with the ID (of the newly inserted row) appended at the end
         return ContentUris.withAppendedId(uri, id);
     }
 
