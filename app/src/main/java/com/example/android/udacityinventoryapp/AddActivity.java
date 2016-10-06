@@ -62,7 +62,6 @@ public class AddActivity extends ActionBarActivity implements LoaderManager.Load
 
         }
 
-
         mNameEditText = (EditText) findViewById(R.id.et_addActivity_name);
         mQuantityEditText = (EditText) findViewById(R.id.et_addActivity_quantity);
         mPriceEditText = (EditText) findViewById(R.id.et_addActivity_price);
