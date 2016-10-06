@@ -1,7 +1,6 @@
 package com.example.android.udacityinventoryapp;
 
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -15,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.android.udacityinventoryapp.adapter.ProductCursorAdapter;
 import com.example.android.udacityinventoryapp.data.ProductContract;
@@ -48,11 +46,12 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
         });
 
         productListView= (ListView) findViewById(R.id.list);
+
+        View emptyView = findViewById(R.id.empty_view);
+        productListView.setEmptyView(emptyView);
+
         adapter= new ProductCursorAdapter(this,null);
         productListView.setAdapter(adapter);
-
-
-
 
         productListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -63,7 +62,6 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
                 startActivity(intent);
             }
         });
-
 
         getSupportLoaderManager().initLoader(PRODUCT_LOADER, null, this);
     }
@@ -84,7 +82,8 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        //region Description/*
+        /*if (id == R.id.action_settings) {
             return true;
         }
         if (id == R.id.action_insert_dummy_data) {
@@ -92,30 +91,11 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
             //Intent intent= new Intent(MainActivity.this, AddActivity.class);
             //startActivity(intent);
             return true;
-        }
+        }*/
+        //endregion
 
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void insertProduct() {
-        ContentValues values = new ContentValues();
-        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, "iPhone");
-        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY ,"45");
-        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE,"700");
-
-
-        Uri newUri=getContentResolver().insert(ProductContract.ProductEntry.CONTENT_URI, values);
-
-        if (newUri == null) {
-            // If the new content URI is null, then there was an error with insertion.
-            Toast.makeText(this, "failed",
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            // Otherwise, the insertion was successful and we can display a toast.
-            Toast.makeText(this, "success",
-                    Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override

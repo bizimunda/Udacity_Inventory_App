@@ -36,5 +36,7 @@
     <string name="action_receive">receive</string>
     <string name="image_upload">Image upload</string>
     <string name="email">Email</string>
+    <string name="empty_view_title_text">Please add some products</string>
+    <string name="empty_view_subtitle_text">Please add products and their quantities</string>
 
 </resources>

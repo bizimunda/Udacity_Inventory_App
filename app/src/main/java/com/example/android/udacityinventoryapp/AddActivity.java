@@ -81,7 +81,30 @@ public class AddActivity extends ActionBarActivity implements LoaderManager.Load
             }
         });
 
+        btnEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                orderItem();
+            }
+        });
 
+
+    }
+
+    private void orderItem() {
+        String subject = "Product Order ";
+        String message = "Product Name: " + mNameEditText.getText() +
+                "\nProduct Price: " + mPriceEditText.getText() +
+                "\nNumber of stocks To be ordered: " + mQuantityEditText.getText();
+        String[] emails = {"info@amazon.com"};
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, emails);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, message);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     private void buttonImageClick() {
@@ -249,19 +272,19 @@ public class AddActivity extends ActionBarActivity implements LoaderManager.Load
 
     private void saveProduct() {
         String nameString = mNameEditText.getText().toString().trim();
-        String countString = mQuantityEditText.getText().toString().trim();
+        String quantityString = mQuantityEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().trim();
 
-        if (TextUtils.isEmpty(nameString) || TextUtils.isEmpty(countString)
+        if (TextUtils.isEmpty(nameString) || TextUtils.isEmpty(quantityString)
                 || TextUtils.isEmpty(priceString)) {
             Toast.makeText(this,"Please fill out all values", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        int count = Integer.valueOf(countString);
+        int quantity = Integer.valueOf(quantityString);
         double price = Double.valueOf(priceString);
 
-        if(count < 0) {
+        if(quantity < 0) {
             Toast.makeText(this,"You must input a real number for the count field.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -281,25 +304,34 @@ public class AddActivity extends ActionBarActivity implements LoaderManager.Load
         imageBitMap.compress(Bitmap.CompressFormat.PNG, 100, bos);
         byte[] imageByteArray = bos.toByteArray();
 
-
-        // Create a ContentValues object where column names are the keys,
-        // and pet attributes from the editor are the values.
         ContentValues values = new ContentValues();
         values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_NAME, nameString);
-        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, count);
+        values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, quantity);
         values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_PRICE, price);
         values.put(ProductContract.ProductEntry.COLUMN_PRODUCT_IMAGE, imageByteArray);
 
-        Uri newUri = getContentResolver().insert(ProductContract.ProductEntry.CONTENT_URI, values);
 
-        // Show a toast message depending on whether or not the insertion was successful
-        if (newUri == null) {
-            // If the row ID is -1, then there was an error with insertion.
-            Toast.makeText(this, "failed", Toast.LENGTH_SHORT).show();
+        if (mCurrentProductUri == null){
+            Uri newUri = getContentResolver().insert(ProductContract.ProductEntry.CONTENT_URI, values);
+
+            if (newUri == null) {
+                // If the row ID is -1, then there was an error with insertion.
+                Toast.makeText(this, "failed", Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the insertion was successful and we can display a toast with the row ID.
+                Toast.makeText(this, "successfully added", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         } else {
-            // Otherwise, the insertion was successful and we can display a toast with the row ID.
-            Toast.makeText(this, "successfully added", Toast.LENGTH_SHORT).show();
-            finish();
+            int rowsAffected = getContentResolver().update(mCurrentProductUri, values, null, null);
+
+            //Show a toast message depending on whether or not the update was successful
+            if (rowsAffected == 0) {
+                Toast.makeText(this, "update failed", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "update successful", Toast.LENGTH_SHORT).show();
+                //id = ProductContract.ProductEntry.getIdFromUri(mCurrentItemUri);
+            }
         }
 
     }

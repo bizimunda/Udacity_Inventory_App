@@ -2,15 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
-    <item
-        android:id="@+id/action_insert_dummy_data"
-        android:title="@string/action_addProduct"
-        app:showAsAction="always" />
 
-    <item
-        android:id="@+id/action_edit"
-        android:title="@string/action_edit"
-        app:showAsAction="always" />
+
 
 
 </menu>
